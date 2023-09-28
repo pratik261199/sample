@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="//js.jotform.com/JotFormCustomWidget.min.js"></script>
+</head>
+<body>
+    <div id="main">
+        <!-- Remove the input field and label -->
+        <!-- <h3>This is my API Widget</h3>
+        <span id="labelText"></span>
+        <input type="text" id="userInput"> -->
+        <button id="submitBtn">Submit</button>
+    </div>
+    <script type="text/javascript">
+        // Always subscribe to the "ready" event and implement widget-related code
+        // Inside the callback function, it's best practice while developing widgets
+        JFCustomWidget.subscribe("ready", function(){
+            // Get the unique_id and customer_id values from JotForm fields
+            var uniqueId = JFCustomWidget.getWidgetSetting('unique_id');
+            var customerId = JFCustomWidget.getWidgetSetting('customer_id');
+
+            // Subscribe to the button click event
+            document.getElementById('submitBtn').addEventListener('click', function () {
+                // Collect any additional form data as needed
+                // For example, you can access form fields using JotForm's JavaScript API
+
+                // Create an object to send to your API
+                var dataToSend = {
+                    unique_id: uniqueId,
+                    customer_id: customerId
+                };
+
+                var apiUrl = 'https://ke-dev-10-kms.kokonetworks.com/jotform/validate'; // Replace with your API endpoint
+
+                // Make an API call using fetch()
+                fetch(apiUrl, {
+                    method: 'POST', // Use the appropriate HTTP method (GET, POST, etc.)
+                    headers: {
+                        'Content-Type': 'application/json', // Set the content type based on your API's requirements
+                    },
+                    body: JSON.stringify(dataToSend) // Send data to the API in JSON format
+                })
+                .then(function(response) {
+                    if (response.ok) {
+                        // If the API call was successful, handle the response here
+                        var hiddenButton = document.getElementById('form-pagebreak-next_25');
+                        hiddenButton.style.display = 'block';
+                        return response.json();
+                    } else {
+                        // If the API call failed, handle the error here
+                        return Promise.reject('API call failed');
+                    }
+                })
+                .then(function(data) {
+                    // Handle the API response data as needed
+                    if (data.isValid) {
+                        // If the API response indicates success, you can continue with form submission
+                        JotForm.submitForm();
+                    } else {
+                        // If the API response indicates failure, you can display an error message
+                        alert('API validation failed. Please check your input.');
+                    }
+                })
+                .catch(function(error) {
+                    // Handle API call errors
+                    console.error('API call error: ' + error);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
